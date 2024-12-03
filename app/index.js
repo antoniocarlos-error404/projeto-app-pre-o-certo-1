@@ -1,7 +1,7 @@
-import React, { useState, } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import useAuthStore from './stores/authStore';
+import useAuthStore from './stores/authStore'; // Ajuste o caminho se necessário
 
 export default function LoginScreen() {
   const [usuario, setUsuario] = useState('');
@@ -9,13 +9,12 @@ export default function LoginScreen() {
   const Login = useAuthStore((state) => state.Login);
   const router = useRouter();
 
-
   const logar = async () => {
     if (usuario && senha) {
       const response = await Login(usuario, senha);
       if (response.success) {
         Alert.alert('Sucesso', response.message);
-        router.push('product'); // Redireciona para a tela de produtos
+        router.push('home'); // Redireciona para a tela de produtos
       } else {
         Alert.alert('Erro', response.message);
       }

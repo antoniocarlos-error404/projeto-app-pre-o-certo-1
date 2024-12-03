@@ -1,194 +1,175 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  Alert,
-  Image,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
-import { launchCameraAsync, useCameraPermissions, PermissionStatus } from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
+import React, { useState, useEffect } from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, SafeAreaView, ScrollView, Alert } from "react-native";
+import { Picker } from '@react-native-picker/picker';
+import * as ImagePicker from 'expo-image-picker';
 
-export default function AddDataWithImage() {
-  // Estados para armazenar os valores dos campos do formulário
-  const [local, setLocal] = useState('');
-  const [nome, setNome] = useState('');
+export default function Produtos() {
+  const [categories, setCategories] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [preco, setPreco] = useState('');
+  const [nome, setNome] = useState('');
   const [categoria, setCategoria] = useState('');
-  const [observacao, setObservacao] = useState('');
-  const [pickedImage, setPickedImage] = useState(null);
+  const [local, setLocal] = useState('');
+  const [descricao, setDescricao] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
 
-  // Hook para gerenciar permissões de câmera
-  const [cameraPermissionInformation, requestPermission] = useCameraPermissions();
-
-  // Função para verificar se a permissão para acessar a câmera foi concedida
-  async function verifyPermission() {
-    const { status } = await requestPermission(); // Solicita a permissão diretamente
-    if (status === PermissionStatus.GRANTED) {
-      return true; // Permissão concedida
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const response = await fetch('https://api-produtos-6p7n.onrender.com/categories');
+        const data = await response.json();
+        setCategories(data);
+      } catch {
+        Alert.alert("Erro", "Não foi possível carregar as categorias.");
+      }
     }
-  
-    if (status === PermissionStatus.DENIED) {
-      Alert.alert(
-        "Permissão Negada",
-        "Você negou o acesso à câmera. Conceda manualmente nas configurações do dispositivo."
-      );
-      return false;
+    async function loadLocations() {
+      try {
+        const response = await fetch('https://api-produtos-6p7n.onrender.com/locations');
+        const data = await response.json();
+        setLocations(data);
+      } catch {
+        Alert.alert("Erro", "Não foi possível carregar os locais.");
+      }
     }
-  
-    Alert.alert(
-      "Permissão Necessária",
-      "A permissão para acessar a câmera é necessária para usar este recurso."
-    );
-    return false;
-  }
-  
+    loadCategories();
+    loadLocations();
+  }, []);
 
-  // Função chamada ao pressionar o botão "Tirar Foto"
-  async function handleTakePhoto() {
-    const hasPermission = await verifyPermission(); // Verifica permissões
-    if (!hasPermission) return; // Interrompe se não houver permissão
-
-    const imageResult = await launchCameraAsync({
-      allowsEditing: true, // Permite edição da imagem
-      aspect: [16, 9], // Define proporção
-      quality: 0.5, // Reduz qualidade para economizar espaço
-    });
-
-    if (!imageResult.canceled) {
-      setPickedImage(imageResult.assets[0].uri); // Armazena o URI da imagem capturada
-    }
-  }
-
-  // Função para salvar a imagem e os dados no dispositivo
-  async function handleSaveData() {
-    // Valida se todos os campos obrigatórios estão preenchidos
-    if (!local || !nome || !preco || !categoria || !pickedImage) {
-      Alert.alert('Erro', 'Preencha todos os campos obrigatórios.');
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert("Permissão necessária", "Permita o acesso à galeria para selecionar imagens.");
       return;
     }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.canceled) setSelectedImage(result.assets[0].uri);
+  };
 
-    try {
-      // Copia a imagem para o armazenamento interno do dispositivo
-      const fileName = pickedImage.split('/').pop(); // Extrai o nome do arquivo da URI
-      const newPath = FileSystem.documentDirectory + fileName;
-
-      await FileSystem.copyAsync({ from: pickedImage, to: newPath });
-
-      Alert.alert(
-        'Dados Salvos',
-        `Imagem salva com sucesso!\nLocal: ${newPath}\n\nOutros Dados:\n- Local: ${local}\n- Nome: ${nome}\n- Preço: ${preco}\n- Categoria: ${categoria}\n- Observação: ${observacao}`
-      );
-    } catch (error) {
-      Alert.alert('Erro', 'Houve um problema ao salvar os dados.');
+  const takePhoto = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert("Permissão necessária", "Permita o acesso à câmera para tirar fotos.");
+      return;
     }
-  }
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+    if (!result.canceled) setSelectedImage(result.assets[0].uri);
+  };
 
-  // Variável para exibir a imagem ou uma mensagem padrão
-  let imagePreview = <Text style={styles.previewText}>Nenhuma imagem capturada</Text>;
-  if (pickedImage) {
-    imagePreview = <Image source={{ uri: pickedImage }} style={styles.imageStyle} />;
-  }
+  const discardImage = () => {
+    setSelectedImage(null);
+  };
+
+  const cadastrar = async () => {
+    if (!selectedImage || !nome || !preco || !categoria || !local) {
+      Alert.alert("Erro", "Por favor, preencha todos os campos obrigatórios!");
+      return;
+    }
+    const data = new FormData();
+    data.append('nome', nome);
+    data.append('preco', preco);
+    data.append('descricao', descricao);
+    data.append('usuario', 'Osvaldo');
+    data.append('categoriaId', categoria);
+    data.append('localId', local);
+    data.append('image', {
+      uri: selectedImage,
+      type: 'image/jpeg',
+      name: 'image.jpg',
+    });
+    try {
+      const response = await fetch("https://api-produtos-6p7n.onrender.com/products", {
+        method: 'POST',
+        body: data,
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (response.status === 201) {
+        Alert.alert("Sucesso", "Produto cadastrado com sucesso!");
+        setNome(''); setPreco(''); setDescricao(''); setCategoria(''); setLocal(''); setSelectedImage(null);
+      } else {
+        const errorData = await response.json();
+        Alert.alert("Erro", errorData.message || "Erro ao cadastrar o produto!");
+      }
+    } catch {
+      Alert.alert("Erro", "Erro ao enviar os dados para a API!");
+    }
+  };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Adicionar Dados</Text>
-
-      <Text style={styles.label}>Local *</Text>
-      <TextInput
-        style={styles.input}
-        value={local}
-        onChangeText={setLocal}
-        placeholder="Digite o local"
-      />
-
-      <Text style={styles.label}>Nome *</Text>
-      <TextInput
-        style={styles.input}
-        value={nome}
-        onChangeText={setNome}
-        placeholder="Digite o nome"
-      />
-
-      <Text style={styles.label}>Preço *</Text>
-      <TextInput
-        style={styles.input}
-        value={preco}
-        onChangeText={setPreco}
-        placeholder="Digite o preço"
-        keyboardType="numeric"
-      />
-
-      <Text style={styles.label}>Categoria *</Text>
-      <TextInput
-        style={styles.input}
-        value={categoria}
-        onChangeText={setCategoria}
-        placeholder="Digite a categoria"
-      />
-
-      <Text style={styles.label}>Observação</Text>
-      <TextInput
-        style={[styles.input, styles.textarea]}
-        value={observacao}
-        onChangeText={setObservacao}
-        placeholder="Digite alguma observação"
-        multiline
-        numberOfLines={4}
-      />
-
-      <View style={styles.imagePreviewContainer}>{imagePreview}</View>
-
-      <Button title="Tirar Foto" onPress={handleTakePhoto} />
-      <Button title="Salvar Dados" onPress={handleSaveData} color="#28a745" />
-    </ScrollView>
+    <SafeAreaView style={styles.container}>
+      <ScrollView>
+        <View>
+          <Text style={styles.label}>Nome *</Text>
+          <TextInput style={styles.input} onChangeText={setNome} value={nome} />
+          <Text style={styles.label}>Preço *</Text>
+          <TextInput style={styles.input} value={preco} onChangeText={(text) => setPreco(text.replace(/[^0-9.]/g, ''))} keyboardType="numeric" placeholder="Digite um valor numérico" />
+          <Text style={styles.label}>Local *</Text>
+          <View style={styles.pickerContainer}>
+            <Picker selectedValue={local} style={styles.picker} onValueChange={(itemValue) => setLocal(itemValue)}>
+              <Picker.Item label="Selecione um local..." value="" />
+              {locations.map(location => <Picker.Item key={location.id} label={location.nome} value={location.id} />)}
+            </Picker>
+          </View>
+          <Text style={styles.label}>Categorias *</Text>
+          <View style={styles.pickerContainer}>
+            <Picker selectedValue={categoria} style={styles.picker} onValueChange={(itemValue) => setCategoria(itemValue)}>
+              <Picker.Item label="Selecione uma categoria..." value="" />
+              {categories.map(category => <Picker.Item key={category.id} label={category.nome} value={category.id} />)}
+            </Picker>
+          </View>
+          <Text style={styles.label}>Observação</Text>
+          <TextInput style={styles.input} onChangeText={setDescricao} value={descricao} />
+          <Text style={styles.label}>Fotos *</Text>
+          <View style={styles.boxImage}>
+            {selectedImage ? (
+              <View style={styles.imageContainer}>
+                <Image source={{ uri: selectedImage }} style={styles.imagePreview} />
+                <TouchableOpacity onPress={discardImage} style={styles.discardButton}>
+                  <Text style={styles.discardButtonText}>Descartar</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View>
+                <TouchableOpacity onPress={pickImage} style={styles.addButton}>
+                  <Text style={styles.addButtonText}>Selecionar da Galeria</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={takePhoto} style={styles.addButton}>
+                  <Text style={styles.addButtonText}>Tirar Foto</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+          <TouchableOpacity onPress={cadastrar} style={styles.saveButton}>
+            <Text style={styles.saveButtonText}>Salvar</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  label: {
-    fontSize: 14,
-    marginBottom: 5,
-    fontWeight: 'bold',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 15,
-    backgroundColor: '#f9f9f9',
-  },
-  textarea: {
-    height: 80,
-  },
-  imagePreviewContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    height: 200,
-    backgroundColor: '#f0cced',
-    marginVertical: 8,
-    borderRadius: 8,
-  },
-  previewText: {
-    color: '#592454',
-  },
-  imageStyle: {
-    width: '100%',
-    height: '100%',
-  },
+  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  label: { marginBottom: 5, fontSize: 16, fontWeight: 'bold' },
+  input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 5, height: 40, marginBottom: 15, paddingHorizontal: 10 },
+  pickerContainer: { borderWidth: 1, borderColor: '#ccc', borderRadius: 5, marginBottom: 15 },
+  picker: { height: 40 },
+  boxImage: { marginBottom: 20 },
+  imageContainer: { alignItems: 'center', marginBottom: 10 },
+  imagePreview: { width: 100, height: 100, marginBottom: 10 },
+  discardButton: { backgroundColor: 'red', padding: 10, borderRadius: 5, marginTop: 10 },
+  discardButtonText: { color: 'white', textAlign: 'center' },
+  addButton: { backgroundColor: 'blue', padding: 10, borderRadius: 5, marginBottom: 10 },
+  addButtonText: { color: 'white', textAlign: 'center' },
+  saveButton: { backgroundColor: 'green', padding: 15, borderRadius: 5 },
+  saveButtonText: { color: 'white', textAlign: 'center', fontSize: 16 },
 });

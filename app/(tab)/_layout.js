@@ -9,7 +9,7 @@ export default function TabsLayout() {
         tabBarIcon: ({ color, size }) => {
           let iconName;
          
-          if (route.name === "product") {
+          if (route.name === "home") {
             iconName = "home";
           
           } else if (route.name === "addProduto") {
@@ -28,9 +28,9 @@ export default function TabsLayout() {
       })}
     >
     
-      <Tabs.Screen name="product" options={{ title: "produto" }} />
+      <Tabs.Screen name="home" options={{ title: "HOME" }} />
       <Tabs.Screen name="addProduto" options={{ title: "Adicionar Produto" }} />
-      <Tabs.Screen name="perfil" options={{ title: "Perfil" }} />
+      <Tabs.Screen name="perfil" options={{ title: "perfil" }} />
       <Tabs.Screen name="adicionarLocal" options={{ title: "local" }} />
     
     </Tabs>
