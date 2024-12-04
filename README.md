@@ -70,3 +70,4 @@ CASO QUEIRA RODAR NO VScode , estandono prompt de comando digite
 -
 code .
 -
+ou pode fazer pelo proprio VScode.
