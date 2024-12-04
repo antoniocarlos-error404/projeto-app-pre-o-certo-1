@@ -8,9 +8,7 @@ Este é um projeto desenvolvido com **React Native** usando o **Expo** para cria
 - [Pré-requisitos](#pré-requisitos)
 - [Instalação](#instalação)
 - [Executando o projeto](#executando-o-projeto)
-- [Estrutura do projeto](#estrutura-do-projeto)
-- [Como contribuir](#como-contribuir)
-- [Licença](#licença)
+)
 
 
 ---
