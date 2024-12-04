@@ -6,8 +6,8 @@ export default function EditarPerfilScreen() {
   const router = useRouter();
 
   // Estados para os campos de edição
-  const [nome, setNome] = useState('maria');
-  const [email, setEmail] = useState('maria@example.com');
+  const [nome, setNome] = useState('Emily');
+  const [email, setEmail] = useState('emily@example.com');
   const [cpf, setCpf] = useState('123.456.789-00');
   const [senha, setSenha] = useState('');
   const [telefone, setTelefone] = useState('(11) 98765-4321');
@@ -21,7 +21,7 @@ export default function EditarPerfilScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back('')} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.navigate('./perfil')} style={styles.backButton}>
           <Text style={styles.backText}>←</Text>
         </TouchableOpacity>
         <Text style={styles.title}>Perfil</Text>
@@ -29,7 +29,7 @@ export default function EditarPerfilScreen() {
 
       <View style={styles.profile}>
         <Image
-          source={{ uri: 'https://dummyjson.com/users/1' }} // Imagem de perfil genérica
+          source={{ uri:  "https://dummyjson.com/icon/emilys/128" }} // Imagem de perfil genérica
           style={styles.profileImage}
         />
         <Text style={styles.profileName}>{nome}</Text>
@@ -139,4 +139,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-});
+}); 

@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
-import useAuthStore from './stores/authStore'; // Ajuste o caminho se necessário
+import useAuthStore from './stores/authStore';
 
 export default function LoginScreen() {
-  const [usuario, setUsuario] = useState('');
-  const [senha, setSenha] = useState('');
-  const Login = useAuthStore((state) => state.Login);
+  const [usuario, setUsuario] = useState('emilys'); // Estado para o usuário
+  const [senha, setSenha] = useState('emilyspass'); // Estado para a senha
+  const Login = useAuthStore((state) => state.Login); // Obtém a função Login do Zustand
   const router = useRouter();
 
   const logar = async () => {
     if (usuario && senha) {
       const response = await Login(usuario, senha);
       if (response.success) {
-        Alert.alert('Sucesso', response.message);
-        router.push('home'); // Redireciona para a tela de produtos
+        Alert.alert('LOGADO COM SUCESSO', response.message || 'Bem-vindo!');
+        router.push('/home'); // Redireciona para a tela principal
       } else {
-        Alert.alert('Erro', response.message);
+        Alert.alert('Erro de Login', response.message || 'Verifique suas credenciais.');
       }
     } else {
       Alert.alert('Atenção', 'Preencha todos os campos!');
@@ -26,10 +26,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       {/* Logo */}
-      <Image
-        source={require('./src/logo.png')} // Substitua pelo caminho do seu logo
-        style={styles.logo}
-      />
+      <Image source={require('./src/logo.png')} style={styles.logo} />
 
       {/* Título */}
       <Text style={styles.title}>Login</Text>
@@ -63,7 +60,7 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       {/* Link de Registrar */}
-      <TouchableOpacity onPress={() => router.push('cadastro')}>
+      <TouchableOpacity onPress={() => router.push('/cadastro')}>
         <Text style={styles.registerText}>Registrar</Text>
       </TouchableOpacity>
     </View>
