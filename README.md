@@ -71,7 +71,8 @@ CASO QUEIRA RODAR NO VScode , entrando no prompt de comando digite
 code .
 -
 ou pode fazer pelo proprio VScode.      
-![image](https://github.com/user-attachments/assets/0b9946df-ff10-465e-b35a-6fbb3569b91d)
+![th-removebg-preview](https://github.com/user-attachments/assets/aae254d2-e667-4546-b2e6-d8e71771faeb)
+
 .
 
 
