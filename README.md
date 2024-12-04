@@ -1,4 +1,4 @@
-# Meu Projeto React Native com Expo APP PREÇO CERTO! [logo](https://github.com/user-attachments/assets/4d345027-bb2c-41a6-92a1-dd99d52156b6)
+# Meu Projeto React Native com Expo APP-PREÇO-CERTO![logo](https://github.com/user-attachments/assets/4d345027-bb2c-41a6-92a1-dd99d52156b6)
 
 
 Este é um projeto desenvolvido com **React Native** usando o **Expo** para criar um aplicativo móvel.
