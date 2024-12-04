@@ -71,6 +71,6 @@ code .
 ou pode fazer pelo proprio VScode.      
 ![th-removebg-preview](https://github.com/user-attachments/assets/aae254d2-e667-4546-b2e6-d8e71771faeb)
 
-.
+
 
 
