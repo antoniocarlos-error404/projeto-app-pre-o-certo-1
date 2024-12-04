@@ -66,7 +66,7 @@ Expo Go para iOS
 Estrutura do Projeto
 Aqui está a estrutura principal do projeto:
 
-CASO QUEIRA RODAR NO VScode , estandono prompt de comando digite
+CASO QUEIRA RODAR NO VScode , entrando no prompt de comando digite
 -
 code .
 -
